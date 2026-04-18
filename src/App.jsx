@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Header from './assets/components/Header';
-import MessageForm from './assets/components/MessageForm';
-import Login from './assets/components/Login';
-import Message from './assets/components/Message';
+import Header from './assets/components/Header.jsx';
+import MessageForm from './assets/components/MessageForm.jsx';
+import Login from './assets/components/Login.jsx';
+import Message from './assets/components/Message.jsx';
 
 const API_URL = 'https://apichat.m89.pl/api/messages';
 
