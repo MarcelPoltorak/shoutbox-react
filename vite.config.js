@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   // Pamiętaj o SWOJEJ nazwie repozytorium na GitHubie!
-  base: '/shoutbox-react/';
+  base: '/shoutbox-react/',
   plugins: [
     react(),
     // 2. Dodajemy i konfigurujemy wtyczkę PWA
@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'Szkolny Shoutbox PRO',
         short_name: 'Shoutbox',
-        description: 'Klasowy komunikator czasu rzeczywistego',d
+        description: 'Klasowy komunikator czasu rzeczywistego',
         theme_color: '#8e44ad',
         background_color: '#f4f7f6',
         display: 'standalone',
