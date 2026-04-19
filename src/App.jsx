@@ -17,8 +17,33 @@ const socket = io(SOCKET_URL);
 
 function App() {
   const [wiadomosci, setWiadomosci] = useState([]);
-  const [mojNick, setMojNick] = useState(localStorage.getItem('shoutboxNick') || '');
+   // NOWOŚĆ 1: Stan przechowujący nick osoby, która aktualnie pisze
+  const [ktoPisze, setKtoPisze] = useState(null);
 
+  useEffect(() => {
+    socket.on('chat_update', (noweWiadomosci) => {
+      setWiadomosci(noweWiadomosci);
+        // NOWOŚĆ 2: Nasłuchujemy, czy ktoś inny pisze
+    let typingTimer;
+    socket.on('is_typing', (nick) => {
+      setKtoPisze(nick); // Zapisujemy nick
+       // Magia UX: Czekamy 2 sekundy. Jeśli w tym czasie nie przyleci 
+      // nowy sygnał 'is_typing', uznajemy, że osoba przestała pisać.
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        setKtoPisze(null);
+      }, 2000);
+    });
+
+    return () => {
+      socket.off('chat_update');
+      socket.off('is_typing'); // <-- Sprzątamy po sobie!
+    };
+  }, []);
+
+  // NOWOŚĆ 3: Funkcja, która odpala się, gdy MY piszemy
+  const handleTyping = () => {
+    socket.emit('typing', mojNick);
   // --- ODBIERANIE WIADOMOŚCI (WEBSOCKET) ---
   useEffect(() => {
     // 3. Nasłuchujemy na sygnał z serwera. Kiedy wpadnie, aktualizujemy Stan!
@@ -62,6 +87,7 @@ function App() {
       await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
     } catch (error) { console.error(error); }
   };
+  
 
   if (!mojNick) {
     return (
@@ -91,6 +117,22 @@ function App() {
         )}
       </div>
       <MessageForm onWyslij={handleDodajWiadomosc} />
+    </div>
+  );
+}
+
+  {/* ... (koniec okna z wiadomościami) ... */}
+      <div>
+
+      {/* NOWOŚĆ 4: Pokaż napis TYLKO wtedy, gdy zmienna ktoPisze nie jest pusta */}
+      {ktoPisze && (
+        <div style={{ padding: '0 20px', fontSize: '0.85em', color: '#7f8c8d', fontStyle: 'italic', marginBottom: '5px' }}>
+          ✏️ {ktoPisze} pisze wiadomość...
+        </div>
+      )}
+
+      {/* NOWOŚĆ 5: Przekazujemy funkcję handleTyping do formularza */}
+      <MessageForm onWyslij={handleDodajWiadomosc} onTyping={handleTyping} />
     </div>
   );
 }
