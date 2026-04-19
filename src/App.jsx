@@ -96,7 +96,7 @@ function App() {
     }
   };
 
-  // 🔹 Login screen
+  // 🔹 Jeśli użytkownik nie jest zalogowany – pokazujemy ekran logowania
   if (!mojNick) {
     return (
       <div className="app-container">
@@ -106,7 +106,7 @@ function App() {
     );
   }
 
-  // 🔹 Główna aplikacja
+  // 🔹 Główna aplikacja czatu (gdy nick jest ustawiony)
   return (
     <div className="app-container">
       <Header />
@@ -131,12 +131,14 @@ function App() {
 
       {/* ✏️ Kto pisze */}
       {ktoPisze && (
-        <div style={{
-          padding: '0 20px',
-          fontSize: '0.85em',
-          color: '#7f8c8d',
-          fontStyle: 'italic'
-        }}>
+        <div
+          style={{
+            padding: '0 20px',
+            fontSize: '0.85em',
+            color: '#7f8c8d',
+            fontStyle: 'italic'
+          }}
+        >
           ✏️ {ktoPisze} pisze wiadomość...
         </div>
       )}
