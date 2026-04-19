@@ -18,6 +18,15 @@ function App() {
 
   const typingTimer = useRef(null);
 
+  // 🔹 Przywracanie nicku po odświeżeniu
+  useEffect(() => {
+    const zapisanyNick = localStorage.getItem('shoutboxNick');
+    if (zapisanyNick) {
+      setMojNick(zapisanyNick);
+    }
+  }, []);
+
+  // 🔹 Socket listeners
   useEffect(() => {
     socket.on('chat_update', (noweWiadomosci) => {
       setWiadomosci(noweWiadomosci);
@@ -38,22 +47,30 @@ function App() {
     };
   }, []);
 
+  // 🔹 Typing event
   const handleTyping = () => {
-    socket.emit('typing', mojNick);
+    if (mojNick) {
+      socket.emit('typing', mojNick);
+    }
   };
 
+  // 🔹 Dodawanie wiadomości
   const handleDodajWiadomosc = async (nowyTekst) => {
     try {
       await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ author: mojNick, text: nowyTekst })
+        body: JSON.stringify({
+          author: mojNick,
+          text: nowyTekst
+        })
       });
     } catch (error) {
       console.error(error);
     }
   };
 
+  // 🔹 Lajk
   const handleLajkuj = async (id) => {
     try {
       await fetch(`${API_URL}/${id}/like`, {
@@ -66,15 +83,20 @@ function App() {
     }
   };
 
+  // 🔹 Usuwanie
   const handleUsun = async (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć tę wiadomość?")) return;
+
     try {
-      await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/${id}`, {
+        method: 'DELETE'
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
+  // 🔹 Login screen
   if (!mojNick) {
     return (
       <div className="app-container">
@@ -84,13 +106,16 @@ function App() {
     );
   }
 
+  // 🔹 Główna aplikacja
   return (
     <div className="app-container">
       <Header />
 
       <div className="chat-window">
         {wiadomosci.length === 0 ? (
-          <p>Ładowanie wiadomości...</p>
+          <p style={{ textAlign: 'center', color: '#999' }}>
+            Ładowanie wiadomości...
+          </p>
         ) : (
           wiadomosci.map((msg) => (
             <Message
@@ -104,15 +129,21 @@ function App() {
         )}
       </div>
 
+      {/* ✏️ Kto pisze */}
       {ktoPisze && (
-        <div style={{ fontStyle: 'italic' }}>
+        <div style={{
+          padding: '0 20px',
+          fontSize: '0.85em',
+          color: '#7f8c8d',
+          fontStyle: 'italic'
+        }}>
           ✏️ {ktoPisze} pisze wiadomość...
         </div>
       )}
 
-      <MessageForm 
-        onWyslij={handleDodajWiadomosc} 
-        onTyping={handleTyping} 
+      <MessageForm
+        onWyslij={handleDodajWiadomosc}
+        onTyping={handleTyping}
       />
     </div>
   );
